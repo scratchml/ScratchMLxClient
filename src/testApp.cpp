@@ -3,37 +3,84 @@
 static const int maxData = 512;
 
 void testApp::loadSettings() {
-	ofxXmlSettings xml;
-	xml.loadFile("settings.xml");
+	
+
+	settingsFile.loadFile("settings.xml");
     unsigned long systemtime = ofGetSystemTime();
+
+    if(settingsFile.getNumTags("sml") != 1){
+        
+        settingsFile.addTag("sml");
+        
+        settingsFile.pushTag("sml");
+        
+        settingsFile.addTag("record");
+        
+        settingsFile.pushTag("record");
+        settingsFile.addValue("format", "serato_2a");
+        settingsFile.addValue("side","right");
+        settingsFile.popTag();
+        
+        settingsFile.addTag("osc");
+        
+        settingsFile.pushTag("osc");
+        settingsFile.addValue("host", "10.0.0.255");
+        settingsFile.addValue("port","12234");
+        settingsFile.popTag();
+        
+        settingsFile.addTag("audio");
+        
+        settingsFile.pushTag("audio");
+        settingsFile.addValue("sampleRate", 44100);
+        settingsFile.addValue("buffersize", 16);
+        settingsFile.addValue("interface", "");
+        settingsFile.addValue("device", 1);
+        settingsFile.popTag();
+        settingsFile.addTag("turntables");
+        settingsFile.pushTag("turntables");
+        settingsFile.addValue("decks", 1);
+        settingsFile.addValue("deck0", "left");
+        settingsFile.addValue("deck1", "right");
+        settingsFile.addValue("deck2", "left_two");
+        settingsFile.addValue("deck3", "right_two");
+        settingsFile.popTag();
+        
+        settingsFile.addTag("serial");
+        settingsFile.popTag();
+    }
+    settingsFile.pushTag("sml");
+    settingsFile.pushTag("record");
+    recordFormat = settingsFile.getValue("format", "serato_2a");
+    recordSide = settingsFile.getValue("side", "right");
+    settingsFile.popTag();
+    
+    settingsFile.pushTag("osc");
+    oscHost = settingsFile.getValue("host", "255.255.255.255");
+    oscPort = settingsFile.getValue("port", 1235);
+    oscSubdivide = settingsFile.getValue("subdivide", 8);
+    oscPitch = settingsFile.getValue("pitch", 0);
+    oscRelative = settingsFile.getValue("relative", 0);
+    oscDegrees = settingsFile.getValue("degrees", 0);
+    settingsFile.popTag();
+    
+    settingsFile.pushTag("audio");
+    audioSamplerate = 44100;
+    audioBuffersize = 16;
+    audioSamplerate = settingsFile.getValue("sampleRate", 44100);
+    audioBuffersize = settingsFile.getValue("buffersize", 16);
+    audioDevice = settingsFile.getValue("device", 1);
+    audioInterface = settingsFile.getValue("interface", "");
+    settingsFile.popTag();
+    
+    settingsFile.pushTag("serial");
+    serialPort = settingsFile.getValue("port", "");
+    serialThreshold = settingsFile.getValue("threshold", 0);
+    settingsFile.popTag();
+    settingsFile.popTag();
+    
+    
     string filename = "session-"+ofToString(systemtime)+".xml";
     scratchMLfile.loadFile(filename);
-	
-	xml.pushTag("record");
-	recordFormat = xml.getValue("format", "serato_2a");
-	recordSide = xml.getValue("side", "right");
-	xml.popTag();
-	
-	xml.pushTag("osc");
-	oscHost = xml.getValue("host", "");
-	oscPort = xml.getValue("port", 0);
-	oscSubdivide = xml.getValue("subdivide", 8);
-	oscPitch = xml.getValue("pitch", 0);
-	oscRelative = xml.getValue("relative", 0);
-	oscDegrees = xml.getValue("degrees", 0);
-	xml.popTag();
-	
-	xml.pushTag("audio");
-	audioSamplerate = 44100;
-	audioBuffersize = 16;
-    audioSamplerate = xml.getValue("sampleRate", 44100);
-    audioBuffersize = xml.getValue("bitRate", 16);
-	xml.popTag();
-	
-	xml.pushTag("serial");
-	serialPort = xml.getValue("port", "");
-	serialThreshold = xml.getValue("threshold", 0);
-	xml.popTag();
     
     if(scratchMLfile.getNumTags("sml") == 0){
         //sml header
@@ -91,9 +138,9 @@ void testApp::loadSettings() {
         scratchMLfile.pushTag("sml");
         scratchMLfile.pushTag("performance");
         scratchMLfile.pushTag("turntable");
-
+        
     }
-
+    
 }
 
 
@@ -108,9 +155,9 @@ void testApp::setup() {
     
 	loadSettings();
     
-
+    
     //fader--------_
-    serialReady = serial.setup(serialPort, 115200);
+    //serialReady = serial.setup(serialPort, 115200);
     //----fader----_
     
     oscRate = (audioSamplerate / audioBuffersize) / oscSubdivide;
@@ -123,8 +170,11 @@ void testApp::setup() {
     
     //soundStream---------_
 	c1.listDevices();
-	//c1.setDeviceIdByName(audioInterface);//"M-Audio, Inc.: M-Audio Conectiv"
-    c1.setup(1, nChannels, audioSamplerate, audioBuffersize, nChannels);
+	if(audioInterface != ""){
+        c1.setDeviceIdByName(audioInterface);
+    }else{
+        c1.setup(audioDevice, nChannels, audioSamplerate, audioBuffersize, nChannels);
+    }
 	ofAddListener(c1.audioReceivedEvent, this, &testApp::audioInputListener);
     //----soundStream-----_
     
@@ -188,6 +238,11 @@ void testApp::exit(){
     scratchMLfile.popTag();
     scratchMLfile.popTag();
     scratchMLfile.popTag();
+    settingsFile.popTag();
+    settingsFile.popTag();
+    settingsFile.popTag();
+    scratchMLfile.saveFile();
+    settingsFile.saveFile();
 }
 
 void testApp::draw() {
@@ -239,177 +294,6 @@ void testApp::audioInputListener(ofxAudioEventArgs &args){
         middleAudioBuffers[i].assign(&inputs[i][0], &inputs[i][0] + args.bufferSize * 2); 
         audioMutex.unlock();
         decks[i].audioInputListener(&inputs[i][0], audioBuffersize);
-       
+        
     }
-    //-----drawudioInput-----_
-    
-    
-    //    if(audioFrame % oscSubdivide == 0) {
-    //        for(int i = 0; i < totalDecks; i++){
-    //            
-    //            float position = oscRelative ? decks[i].xwax.getRelative() : decks[i].xwax.getAbsolute();
-    //            ofxOscMessage msg;
-    //            msg.setAddress("/scratch/record/" + recordSide);
-    //            msg.addFloatArg(position);
-    //            osc.sendMessage(msg);
-    //    
-    //    
-    //            scratchMLfile.pushTag("turntable");
-    //            scratchMLfile.pushTag(recordSide);
-    //            scratchMLfile.pushTag("data");
-    //            scratchMLfile.addValue("p", position);
-    //            scratchMLfile.popTag();
-    //            scratchMLfile.popTag();
-    //            scratchMLfile.popTag();
-    //            
-    //            if(oscPitch) {
-    //                ofxOscMessage msg;
-    //                msg.setAddress("/scratch/record/" + recordSide + "/pitch");
-    //                msg.addFloatArg(decks[i].xwax.getPitch());
-    //                osc.sendMessage(msg);
-    //                scratchMLfile.pushTag(ofToString(audioFrame));
-    //                scratchMLfile.pushTag(recordSide);
-    //                scratchMLfile.addValue("pitch", decks[i].xwax.getPitch());
-    //                scratchMLfile.popTag();
-    //                scratchMLfile.popTag();
-    //            
-    //            }
-    //            if(oscDegrees) {
-    //                ofxOscMessage msg;
-    //                msg.setAddress("/scratch/record/" + recordSide + "/degrees");
-    //                msg.addFloatArg(fmodf(decks[i].xwax.millisToDegrees(position), 360));
-    //                osc.sendMessage(msg);
-    //                scratchMLfile.pushTag(ofToString(audioFrame));
-    //                scratchMLfile.pushTag(recordSide);
-    //                scratchMLfile.addValue("degrees", fmodf(decks[i].xwax.millisToDegrees(position), 360));
-    //                scratchMLfile.popTag();
-    //                scratchMLfile.popTag();
-    //            }
-    //        }
-    //          
-    //    }
-    //    audioFrame++;
-    //    	
-    //    
-    //fader--------_
-	if(serialReady) {
-		unsigned char faderData;
-		int nRead;
-		while ((nRead = serial.readBytes(&faderData, 1)) > 0) {
-			bool prevOverThreshold = overThreshold;
-			overThreshold = faderData > serialThreshold;
-			if(prevOverThreshold != overThreshold) {
-				ofxOscMessage msg;
-				msg.setAddress("/scratch/mixer/fader");
-				msg.addFloatArg(overThreshold ? 1 : 0);
-				osc.sendMessage(msg);
-                scratchMLfile.addTag(ofToString(audioFrame));
-                scratchMLfile.pushTag(ofToString(audioFrame));
-                scratchMLfile.addTag("mixer");
-                scratchMLfile.pushTag("mixer");
-                scratchMLfile.addTag("fader");
-                scratchMLfile.pushTag("fader");
-                scratchMLfile.addValue("position", overThreshold?1:0);
-                scratchMLfile.popTag();
-                scratchMLfile.popTag();
-                scratchMLfile.popTag();
-			}
-			faderPosition.push_back(faderData);
-            if(faderPosition.size() > maxData) {
-                faderPosition.pop_front();
-            }
-		}
-	}
-    //---fader----_
 }
-
-//void testApp::audioIn(float* input, int audioBuffersize, int nChannels) {
-//	xwax.update(input);
-//	
-//	audioMutex.lock();
-//	middleAudioBuffer.assign(input, input + audioBuffersize * nChannels);
-//	audioMutex.unlock();
-
-//	absolutePosition.push_back(xwax.getAbsolute());
-//	relativePosition.push_back(xwax.getRelative());
-//	if(absolutePosition.size() > maxData) {
-//		absolutePosition.pop_front();
-//	}
-//	if(relativePosition.size() > maxData) {
-//		relativePosition.pop_front();
-//	}
-//	
-//	if(audioFrame % oscSubdivide == 0) {
-//		float position = oscRelative ? xwax.getRelative() : xwax.getAbsolute();
-//		ofxOscMessage msg;
-//		msg.setAddress("/scratch/record/" + recordSide);
-//		msg.addFloatArg(position);
-//		osc.sendMessage(msg);
-//
-//
-//        scratchMLfile.pushTag("turntable");
-//        scratchMLfile.pushTag(recordSide);
-//        scratchMLfile.pushTag("data");
-//        scratchMLfile.addValue("p", position);
-//        scratchMLfile.popTag();
-//        scratchMLfile.popTag();
-//        scratchMLfile.popTag();
-//        
-//		if(oscPitch) {
-//			ofxOscMessage msg;
-//			msg.setAddress("/scratch/record/" + recordSide + "/pitch");
-//			msg.addFloatArg(xwax.getPitch());
-//			osc.sendMessage(msg);
-//            scratchMLfile.pushTag(ofToString(audioFrame));
-//            scratchMLfile.pushTag(recordSide);
-//            scratchMLfile.addValue("pitch", xwax.getPitch());
-//            scratchMLfile.popTag();
-//            scratchMLfile.popTag();
-//            
-//		}
-//		if(oscDegrees) {
-//			ofxOscMessage msg;
-//			msg.setAddress("/scratch/record/" + recordSide + "/degrees");
-//			msg.addFloatArg(fmodf(xwax.millisToDegrees(position), 360));
-//			osc.sendMessage(msg);
-//            scratchMLfile.pushTag(ofToString(audioFrame));
-//            scratchMLfile.pushTag(recordSide);
-//            scratchMLfile.addValue("degrees", fmodf(xwax.millisToDegrees(position), 360));
-//            scratchMLfile.popTag();
-//            scratchMLfile.popTag();
-//		}
-//      
-//    }
-//	audioFrame++;
-//	
-//	if(serialReady) {
-//		unsigned char faderData;
-//		int nRead;
-//		while ((nRead = serial.readBytes(&faderData, 1)) > 0) {
-//			bool prevOverThreshold = overThreshold;
-//			overThreshold = faderData > serialThreshold;
-//			if(prevOverThreshold != overThreshold) {
-//				ofxOscMessage msg;
-//				msg.setAddress("/scratch/mixer/fader");
-//				msg.addFloatArg(overThreshold ? 1 : 0);
-//				osc.sendMessage(msg);
-//    
-//                scratchMLfile.addTag(ofToString(audioFrame));
-//                scratchMLfile.pushTag(ofToString(audioFrame));
-//                scratchMLfile.addTag("mixer");
-//                scratchMLfile.pushTag("mixer");
-//                scratchMLfile.addTag("fader");
-//                scratchMLfile.pushTag("fader");
-//                scratchMLfile.addValue("position", overThreshold?1:0);
-//                scratchMLfile.popTag();
-//                scratchMLfile.popTag();
-//                scratchMLfile.popTag();
-//                
-//			}
-//			faderPosition.push_back(faderData);
-//			if(faderPosition.size() > maxData) {
-//				faderPosition.pop_front();
-//			}
-//		}
-//	}
-//}

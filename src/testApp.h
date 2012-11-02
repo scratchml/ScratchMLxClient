@@ -16,7 +16,7 @@ public:
 	void exit();
     
     ofxXmlSettings scratchMLfile;
-    
+    ofxXmlSettings settingsFile;
     ofxOscSender osc;
 	ofSerial serial;
 	graphicCurve drawFader;
@@ -41,7 +41,7 @@ public:
     
     //soundStream---------_
     vector< vector<float> > inputs;
-    int nChannels;
+    int nChannels, audioDevice;
     void audioInputListener (ofxAudioEventArgs &args);
     ofxSoundStream c1;
     //----soundStream-----_
