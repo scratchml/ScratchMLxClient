@@ -5,8 +5,8 @@
         <notes> this release is so BETA it redefines BETA.  
         		Stay tuned for a better UI and more features.
         	</notes>
-        <url>www.scratchml.com</url>
-        <github>https://github.com/scratchml</github>
+        <url>"www.scratchml.com"</url>
+        <github>"https://github.com/scratchml"</github>
     </about>
 
     PLEASE NOTE YOU NEED THE FOLLOWING EXTERNAL ADDONS:
