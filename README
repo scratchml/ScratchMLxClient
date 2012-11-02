@@ -1,18 +1,35 @@
 <sml>
 	<about>
-        <client>--ScratchML-- Version: BETA.0</client>
-        <authors>@ScratchML, so blame/tweet them if it sucks ballz</authors>
-        <notes> this release is so BETA it redefines BETA.  
-        		Stay tuned for a better UI and more features.
-        	</notes>
-        <url>"www.scratchml.com"</url>
-        <github>"https://github.com/scratchml"</github>
-    </about>
+        --ScratchMLxClient-- 
+        Version: BETA.0
+        authors: @ScratchML, so blame/tweet them if it sucks ballz
+		www.scratchml.com
+        https://github.com/scratchml
+
+
+        This is an openFrameworks app and is release in source code only (for now binary releases coming soon!) 
+
+        Please visit : http://www.openframeworks.cc/download/ to download the lastest release of openFrameworks and read the setup guides. 
+
+        If you are hardcore and want to run with the lastest and greatest visit the openFrameworks github and checkout the develop branch:
+
+        	openFrameworks
+        		https://github.com/openframeworks/openFrameworks
+
+        		git clone git://github.com/openframeworks/openFrameworks.git
+        		git checkout develop
+
+        *please note this will take a while to download
 
     PLEASE NOTE YOU NEED THE FOLLOWING EXTERNAL ADDONS:
 	
-		ofxSoundStream
-		ofxXwax
+		ofxSoundStream 
+			https://github.com/jocabola/ofxSoundStream 
+			git clone git://github.com/jocabola/ofxSoundStream.git
+		
+		ofxXwax 
+			http://github.com/scratchml/ofxXwax 
+			git clone git://github.com/scratchml/ofxXwax.git
 
 	Most of this work is by @kcimc , Lee Meredith, and @theDANtheMAN.  In this release we can track as many Turntables as you have audio inputs.  It will write the raw SML performace tag to XML and also send OSC Messages to the defined host:port.  This is soo beta it hasn't been tested with actual turntables, but hopefully that will change.
 	
@@ -69,8 +86,6 @@
 		</serial>
 	</sml>
 
-
-
 Compile. 
 
 
@@ -111,3 +126,7 @@ Compile.
 	    </performance>
 	</sml>
 </sml>
+
+if you've read this far stay tuned for ScratchMLxEmbedded and ScratchMLxRaspberryPi 
+
+Also : http://www.youtube.com/watch?v=3SMhxOgf7ys
