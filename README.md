@@ -1,7 +1,7 @@
 ## ScratchMLxClient 
 ####Version: BETA.0
 ####authors: @ScratchML, so blame/tweet them if it sucks ballz
-####[ScratchML](www.scratchml.com)
+####[ScratchML](http://www.scratchml.com)
 ####[Github](https://github.com/scratchml)
 
 
