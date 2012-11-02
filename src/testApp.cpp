@@ -63,6 +63,9 @@ void testApp::loadSettings() {
     oscDegrees = settingsFile.getValue("degrees", 0);
     settingsFile.popTag();
     
+    settingsFile.pushTag("turntables");
+    totalDecks = settingsFile.getValue("decks", 1);
+    
     settingsFile.pushTag("audio");
     audioSamplerate = 44100;
     audioBuffersize = 16;
@@ -150,9 +153,7 @@ void testApp::setup() {
 	ofSetDrawBitmapMode(OF_BITMAPMODE_MODEL_BILLBOARD);
 	ofSetCircleResolution(50);
 	ofSetLineWidth(2);
-	
-    totalDecks = 1;
-    
+	    
 	loadSettings();
     
     
