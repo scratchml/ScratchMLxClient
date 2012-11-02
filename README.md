@@ -1,4 +1,4 @@
-# ScratchMLxClient 
+## ScratchMLxClient 
 ####Version: BETA.0
 ####authors: @ScratchML, so blame/tweet them if it sucks ballz
 ####[ScratchML](www.scratchml.com)
@@ -6,25 +6,25 @@
 
 
 This is an openFrameworks app and is release in source code only (binary releases coming soon!): 
-## [openFrameworks](http://openframeworks.cc/) is a C++ toolkit for creative coding
+	[openFrameworks](http://openframeworks.cc/) is a C++ toolkit for creative coding
 
-##External addons:
+###External addons:
 
-###[ofxSoundStream] (https://github.com/jocabola/ofxSoundStream)
+#####[ofxSoundStream] (https://github.com/jocabola/ofxSoundStream)
 git clone git://github.com/jocabola/ofxSoundStream.git
 
-###[ofxXwax] (http://github.com/scratchml/ofxXwax)
+#####[ofxXwax] (http://github.com/scratchml/ofxXwax)
 git clone git://github.com/scratchml/ofxXwax.git
 
 
-##About
+###About
 Most of this work is by @kcimc , Lee Meredith, and @theDANtheMAN.  In this release we can track as many Turntables as you have audio inputs.  It will write the raw SML performace tag to XML and also send OSC Messages to the defined host:port.  This is soo beta it hasn't been tested with actual turntables, but hopefully that will change.
 
 
-##Setup
+###Setup
 
 
-###Configure the settings.xml file:
+####Configure the settings.xml file:
 
 				<sml>
 					<record>
@@ -76,7 +76,7 @@ Most of this work is by @kcimc , Lee Meredith, and @theDANtheMAN.  In this relea
 					</sml>
 
 
-#SML File
+###SML File
 Below is an exmaple of the SML file, `data/Session-X*.xml`, that will be generated.  
 
 				<sml>
