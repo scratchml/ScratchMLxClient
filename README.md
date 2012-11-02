@@ -35,7 +35,7 @@ Most of this work is by @kcimc , Lee Meredith, and @theDANtheMAN.  In this relea
 		<format>serato_2a</format>
 		<side>right</side>
 		<!-- changes the OSC message address -->
-	</record>
+		</record>
 	<osc>
 	<!-- change to X.X.X.X.255 where XXX is your IP address --> 
 		<host>localhost</host>
@@ -44,7 +44,7 @@ Most of this work is by @kcimc , Lee Meredith, and @theDANtheMAN.  In this relea
 		<relative>0</relative> <!-- use relative instead of absolute position -->
 		<pitch>0</pitch> <!-- send pitch data -->
 		<degrees>0</degrees> <!-- send orientation in degrees -->
-	</osc>
+		</osc>
 	<audio>
 		<!-- the samplerate/buffersize should match your audio settings -->
 		<sampleRate>44100</sampleRate>
@@ -54,14 +54,14 @@ Most of this work is by @kcimc , Lee Meredith, and @theDANtheMAN.  In this relea
 		<!-- if Device name is not present it will default 
 		to the device id on a mac the audio-in is device 1-->
 		<device>1</device>
-	</audio>
+		</audio>
 	<turntables>
 		<decks>1</decks>
 		<deck0>left</deck0>
 		<deck1>right</deck1>
 		<deck2>left_two</deck2>
 		<deck3>right_two</deck3>
-	</turntables>
+		</turntables>
 <!-- serial is disabled -->
 	<serial>
 		<!-- the arduino should report a stream of bytes on this port was tty.usbmodemfd121-->
@@ -82,35 +82,35 @@ Below is an exmaple of the SML file, `data/Session-X*.xml`, that will be generat
 	<version>
 		<major>0</major>
 		<minor>6</minor>
-	</version>
+		</version>
 		<about>
 			<client>--ScratchML-- Version: BETA.0</client>
 			<authors>@ScratchML, so blame/tweet them if it sucks ballz</authors>
 			<url>www.scratchml.com</url>
 			<github>https://github.com/scratchml</github>
-		</about>
+			</about>
 	<audio>
 		<sample>
-		<filename>connect me to the GUI</filename>
-		<description>connect me to the GUI</description>
-		<deck>connect me to the GUI</deck>
-		<start>connect me to the GUI</start>
-		<stop>connect me ot the GUI</stop>
-		</sample>
-	</audio>
+			<filename>connect me to the GUI</filename>
+			<description>connect me to the GUI</description>
+			<deck>connect me to the GUI</deck>
+			<start>connect me to the GUI</start>
+			<stop>connect me ot the GUI</stop>
+			</sample>
+		</audio>
 	<performance>
 		<turntable>
 			<deck0>
 				<samplerate>375</samplerate>
 				<data></data>
-			</deck0>
+				</deck0>
 			<deck1>
 				<samplerate>375</samplerate>
 				<data></data>
-			</deck1>
-		</turntable>
-	</performance>
-</sml>
+				</deck1>
+			</turntable>
+		</performance>
+	</sml>
 
 if you've read this far stay tuned for ScratchMLxEmbedded and ScratchMLxRaspberryPi 
 
