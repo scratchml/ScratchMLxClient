@@ -1,8 +1,12 @@
 # ScratchMLxClient 
-##Version: BETA.0
-##authors: @ScratchML, so blame/tweet them if it sucks ballz
-##[ScratchML](www.scratchml.com)
-##[Github](https://github.com/scratchml)
+
+Version: BETA.0
+
+authors: @ScratchML, so blame/tweet them if it sucks ballz
+
+[ScratchML](www.scratchml.com)
+
+[Github](https://github.com/scratchml)
 
 
 This is an openFrameworks app and is release in source code only (binary releases coming soon!): 
@@ -11,10 +15,10 @@ This is an openFrameworks app and is release in source code only (binary release
 ##External addons:
 
 ###[ofxSoundStream] (https://github.com/jocabola/ofxSoundStream)
-####git clone git://github.com/jocabola/ofxSoundStream.git
+#####git clone git://github.com/jocabola/ofxSoundStream.git
 
 ###[ofxXwax] (http://github.com/scratchml/ofxXwax)
-####git clone git://github.com/scratchml/ofxXwax.git
+#####git clone git://github.com/scratchml/ofxXwax.git
 
 
 ##About
@@ -25,7 +29,7 @@ Most of this work is by @kcimc , Lee Meredith, and @theDANtheMAN.  In this relea
 
 
 ###Configure the settings.xml file:
-
+[code]
 <sml>
 	<record>
 		<!--
@@ -74,10 +78,12 @@ Most of this work is by @kcimc , Lee Meredith, and @theDANtheMAN.  In this relea
 		<threshold>240</threshold>
 		</serial>
 	</sml>
+	[/code]
 
 #SML File
 Below is an exmaple of the SML file, `data/Session-X*.xml`, that will be generated.  
 
+[code]
 <sml>
 	<version>
 		<major>0</major>
@@ -111,6 +117,7 @@ Below is an exmaple of the SML file, `data/Session-X*.xml`, that will be generat
 			</turntable>
 		</performance>
 	</sml>
+	[/code]
 
 if you've read this far stay tuned for ScratchMLxEmbedded and ScratchMLxRaspberryPi 
 
