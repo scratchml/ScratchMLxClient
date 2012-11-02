@@ -29,8 +29,8 @@ Most of this work is by @kcimc , Lee Meredith, and @theDANtheMAN.  In this relea
 
 
 ###Configure the settings.xml file:
-[code]
-<sml>
+
+```<sml>
 	<record>
 		<!--
 		format can be: serato_2a, serato_2b, serato_cd, traktor_a,
@@ -77,14 +77,13 @@ Most of this work is by @kcimc , Lee Meredith, and @theDANtheMAN.  In this relea
 		-->
 		<threshold>240</threshold>
 		</serial>
-	</sml>
-	[/code]
+	</sml>```
+
 
 #SML File
 Below is an exmaple of the SML file, `data/Session-X*.xml`, that will be generated.  
 
-[code]
-<sml>
+```<sml>
 	<version>
 		<major>0</major>
 		<minor>6</minor>
@@ -116,8 +115,7 @@ Below is an exmaple of the SML file, `data/Session-X*.xml`, that will be generat
 				</deck1>
 			</turntable>
 		</performance>
-	</sml>
-	[/code]
+	</sml>```
 
 if you've read this far stay tuned for ScratchMLxEmbedded and ScratchMLxRaspberryPi 
 
