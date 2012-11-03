@@ -21,6 +21,8 @@ public:
 	ofSerial serial;
 	graphicCurve drawFader;
     
+    ofxSVG fatLogo;
+    
 	bool serialReady;
 	unsigned char serialThreshold;
 	bool overThreshold;
@@ -33,6 +35,9 @@ public:
     
     deque<float> faderPosition;
     
+    float step_R;
+    float step_L;
+    int count;
     //deck-----------_
     int totalDecks;
     float cellWidth, cellHeight, incrementCellHeight;

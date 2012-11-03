@@ -70,7 +70,7 @@ bool deck::hasMessage(){
 ofxOscMessage deck::getMessage(){
     float position = oscRelative?xwax.getRelative():xwax.getAbsolute();
     ofxOscMessage msg;
-    msg.setAddress("/scratch/record/" + recordSide);
+    msg.setAddress("/scratch/record/" + name);
     msg.addFloatArg(position);
     scratchMLfile.pushTag(name);
     scratchMLfile.pushTag("data");
@@ -80,7 +80,7 @@ ofxOscMessage deck::getMessage(){
     
     if(oscPitch) {
         ofxOscMessage msg_p;
-        msg_p.setAddress("/scratch/record/" + recordSide + "/pitch");
+        msg_p.setAddress("/scratch/record/" + name + "/pitch");
         msg_p.addFloatArg(xwax.getPitch());
 //        scratchMLfile.pushTag(ofToString(audioFrame));
 //        scratchMLfile.pushTag(name);
@@ -90,7 +90,7 @@ ofxOscMessage deck::getMessage(){
     }
     if(oscDegrees) {
         ofxOscMessage msg_d;
-        msg_d.setAddress("/scratch/record/" + recordSide + "/degrees");
+        msg_d.setAddress("/scratch/record/" + name + "/degrees");
         float temp_d = fmodf(xwax.millisToDegrees(position), 360);
         msg_d.addFloatArg(temp_d);
 //        scratchMLfile.pushTag(ofToString(audioFrame));

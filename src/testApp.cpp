@@ -4,10 +4,10 @@ static const int maxData = 512;
 
 void testApp::loadSettings() {
 	
-
+    
 	settingsFile.loadFile("settings.xml");
     unsigned long systemtime = ofGetSystemTime();
-
+    
     if(settingsFile.getNumTags("sml") != 1){
         
         settingsFile.addTag("sml");
@@ -141,19 +141,19 @@ void testApp::loadSettings() {
         scratchMLfile.pushTag("sml");
         scratchMLfile.pushTag("performance");
         scratchMLfile.pushTag("turntable");
-        
     }
     
+    fatLogo.load("fatLogo.svg");
 }
 
 
 void testApp::setup() {
-	ofSetWindowTitle("ScratchOSC");
+	ofSetWindowTitle("ScratchML");
 	ofSetVerticalSync(true);
 	ofSetDrawBitmapMode(OF_BITMAPMODE_MODEL_BILLBOARD);
-	ofSetCircleResolution(50);
-	ofSetLineWidth(2);
-	    
+	ofSetCircleResolution(150);
+	ofSetLineWidth(1);
+    
 	loadSettings();
     
     
@@ -224,6 +224,12 @@ void testApp::update() {
         if(decks[i].hasMessage()){
             ofxOscMessage m =decks[i].getMessage();
             osc.sendMessage(m);
+            if(m.getAddress() == "/scratch/record/deck0"){
+                step_R = ofMap(count, 0, 1800, 0, 1);
+            }
+            if(m.getAddress() == "/scratch/record/deck1"){
+                step_L = ofMap(count, 0, 1800, 0, 1);
+            }
         }
         //------deck-----_
         //graphicAudioInputs----------_
@@ -232,6 +238,12 @@ void testApp::update() {
         audioMutex.unlock();
         //-----graphicAudioInputs-----_
     }
+    count+=15;
+    if(count > 1800){
+        count = 0;
+    }
+    step_L = abs(step_L);
+    step_R = abs(step_R);
 }
 
 void testApp::exit(){
@@ -268,8 +280,70 @@ void testApp::draw() {
     ofSetColor(255);
     drawFader.draw(faderPosition, 128, 0, 255);
 	ofPopMatrix();
-    //----fader----_
-    scratchMLfile.saveFile();
+    
+    ofPushMatrix();
+	ofTranslate(ofGetWidth()-10-fatLogo.getWidth()*.75, ofGetHeight()-10-fatLogo.getHeight()*.75);
+    ofScale(.75, .75);
+    
+    for (int i = 0; i < fatLogo.getNumPath(); i++)
+    {
+        ofPath &p = fatLogo.getPathAt(i);
+        ofColor c = fatLogo.getPathAt(i).getFillColor();
+        vector<ofPolyline>& lines = p.getOutline();
+        
+        for (int k = 0; k < lines.size(); k++)
+        {
+            ofPolyline line = lines[k].getResampledBySpacing(1);
+            line = line.getSmoothed(1);
+            
+            int num = step_R * line.size();
+            if(step_R == 0){
+                num = line.size();
+            }
+            
+            glBegin(GL_LINE_STRIP);
+            for (int j = 0; j < num; j++)
+            {
+                ofVec3f &vv = line[j];
+                ofSetColor(c);
+                glVertex3f(vv.x, vv.y, vv.z);
+            }
+            glEnd();
+        }
+    }
+    ofPopMatrix();
+    
+    ofPushMatrix();
+	ofTranslate(10, ofGetHeight()-10-fatLogo.getHeight()*.75);
+    ofScale(.75, .75);
+
+    for (int i = 0; i < fatLogo.getNumPath(); i++)
+    {
+        ofPath &p = fatLogo.getPathAt(i);
+        ofColor c = fatLogo.getPathAt(i).getFillColor();
+        vector<ofPolyline>& lines = p.getOutline();
+        for (int k = 0; k < lines.size(); k++)
+        {
+            ofPolyline line = lines[k].getResampledBySpacing(1);
+            line = line.getSmoothed(1);
+            
+            int num = step_R * line.size();
+            if(step_L == 0){
+                num = line.size();
+            }
+            
+            
+            glBegin(GL_LINE_STRIP);
+            for (int j = 0; j < num; j++)
+            {
+                ofVec3f &vv = line[j];
+                ofSetColor(c);
+                glVertex3f(vv.x, vv.y, vv.z);
+            }
+            glEnd();
+        }
+    }
+    ofPopMatrix();
 }
 
 //--------------------------------------------------------------
