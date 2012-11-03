@@ -225,10 +225,10 @@ void testApp::update() {
             ofxOscMessage m =decks[i].getMessage();
             osc.sendMessage(m);
             if(m.getAddress() == "/scratch/record/deck0"){
-                step_R = ofMap(count, 0, 1800, 0, 1);
+                step_R = ofMap(m., 0, 1800, -.9, .9);
             }
             if(m.getAddress() == "/scratch/record/deck1"){
-                step_L = ofMap(count, 0, 1800, 0, 1);
+                step_L = ofMap(count, 0, 1800, -.9, .9);
             }
         }
         //------deck-----_
@@ -276,74 +276,79 @@ void testApp::draw() {
         //-----graphicAudioInputs-----_
     }
     //fader--------_
-    ofPushMatrix();
-    ofSetColor(255);
-    drawFader.draw(faderPosition, 128, 0, 255);
-	ofPopMatrix();
-    
-    ofPushMatrix();
-	ofTranslate(ofGetWidth()-10-fatLogo.getWidth()*.75, ofGetHeight()-10-fatLogo.getHeight()*.75);
-    ofScale(.75, .75);
-    
-    for (int i = 0; i < fatLogo.getNumPath(); i++)
-    {
-        ofPath &p = fatLogo.getPathAt(i);
-        ofColor c = fatLogo.getPathAt(i).getFillColor();
-        vector<ofPolyline>& lines = p.getOutline();
-        
-        for (int k = 0; k < lines.size(); k++)
-        {
-            ofPolyline line = lines[k].getResampledBySpacing(1);
-            line = line.getSmoothed(1);
-            
-            int num = step_R * line.size();
-            if(step_R == 0){
-                num = line.size();
-            }
-            
-            glBegin(GL_LINE_STRIP);
-            for (int j = 0; j < num; j++)
-            {
-                ofVec3f &vv = line[j];
-                ofSetColor(c);
-                glVertex3f(vv.x, vv.y, vv.z);
-            }
-            glEnd();
-        }
-    }
-    ofPopMatrix();
-    
-    ofPushMatrix();
-	ofTranslate(10, ofGetHeight()-10-fatLogo.getHeight()*.75);
-    ofScale(.75, .75);
-
-    for (int i = 0; i < fatLogo.getNumPath(); i++)
-    {
-        ofPath &p = fatLogo.getPathAt(i);
-        ofColor c = fatLogo.getPathAt(i).getFillColor();
-        vector<ofPolyline>& lines = p.getOutline();
-        for (int k = 0; k < lines.size(); k++)
-        {
-            ofPolyline line = lines[k].getResampledBySpacing(1);
-            line = line.getSmoothed(1);
-            
-            int num = step_R * line.size();
-            if(step_L == 0){
-                num = line.size();
-            }
-            
-            
-            glBegin(GL_LINE_STRIP);
-            for (int j = 0; j < num; j++)
-            {
-                ofVec3f &vv = line[j];
-                ofSetColor(c);
-                glVertex3f(vv.x, vv.y, vv.z);
-            }
-            glEnd();
-        }
-    }
-    ofPopMatrix();
+//    ofPushMatrix();
+//    ofSetColor(255);
+//    drawFader.draw(faderPosition, 128, 0, 255);
+//	ofPopMatrix();
+//    
+//    ofPushMatrix();
+//	ofTranslate(ofGetWidth()-10-fatLogo.getWidth(), ofGetHeight()-10-fatLogo.getHeight());
+//
+//    if(step_R < 1 && step_R != 0){
+//    for (int i = 0; i < fatLogo.getNumPath(); i++)
+//    {
+//        ofPath &p = fatLogo.getPathAt(i);
+//        ofColor c = fatLogo.getPathAt(i).getFillColor();
+//        vector<ofPolyline>& lines = p.getOutline();
+//        
+//        for (int k = 0; k < lines.size(); k++)
+//        {
+//            ofPolyline line = lines[k].getResampledBySpacing(1);
+//            line = line.getSmoothed(1);
+//            
+//            int num = step_R * line.size();
+//            if(step_R == 0){
+//                num = line.size();
+//            }
+//            glBegin(GL_LINE_STRIP);
+//            for (int j = 0; j < num; j++)
+//            {
+//                ofVec3f &vv = line[j];
+//                ofSetColor(c);
+//                glVertex3f(vv.x, vv.y, vv.z);
+//            }
+//            glEnd();
+//        }
+//    }
+//    }else{
+//        fatLogo.draw();
+//    }
+//    ofPopMatrix();
+//    
+//    ofPushMatrix();
+//	ofTranslate(10, ofGetHeight()-10-fatLogo.getHeight());
+//
+//    if(step_L < 1 && step_L != 0){
+//    for (int i = 0; i < fatLogo.getNumPath(); i++)
+//    {
+//        ofPath &p = fatLogo.getPathAt(i);
+//        ofColor c = fatLogo.getPathAt(i).getFillColor();
+//        vector<ofPolyline>& lines = p.getOutline();
+//        for (int k = 0; k < lines.size(); k++)
+//        {
+//            ofPolyline line = lines[k].getResampledBySpacing(.125);
+//            line = line.getSmoothed(1);
+//            
+//            int num = step_R * line.size();
+//            if(step_L == 0){
+//                num = line.size();
+//            }
+//            
+//            
+//            glBegin(GL_LINE_STRIP);
+//            for (int j = 0; j < num; j++)
+//            {
+//                ofVec3f &vv = line[j];
+//                ofSetColor(c);
+//                glVertex3f(vv.x, vv.y, vv.z);
+//            }
+//            glEnd();
+//        }
+//    }
+//    }else{
+//        fatLogo.draw();
+//    }
+//    ofPopMatrix();
 }
 
 //--------------------------------------------------------------
