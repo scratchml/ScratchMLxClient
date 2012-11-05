@@ -68,32 +68,19 @@ ofxOscMessage deck::getMessage(){
     ofxOscMessage msg;
     msg.setAddress("/scratch/record/" + name);
     msg.addFloatArg(position);
-    scratchMLfile.pushTag(name);
-    scratchMLfile.pushTag("data");
-    scratchMLfile.addValue("p", position);
-    scratchMLfile.popTag();
-    scratchMLfile.popTag();
+    
     
     if(oscPitch) {
         ofxOscMessage msg_p;
         msg_p.setAddress("/scratch/record/" + name + "/pitch");
         msg_p.addFloatArg(xwax.getPitch());
-//        scratchMLfile.pushTag(ofToString(audioFrame));
-//        scratchMLfile.pushTag(name);
-//        scratchMLfile.addValue("pitch", xwax.getPitch());
-//        scratchMLfile.popTag();
-//        scratchMLfile.popTag();
+        
     }
     if(oscDegrees) {
         ofxOscMessage msg_d;
         msg_d.setAddress("/scratch/record/" + name + "/degrees");
         float temp_d = fmodf(xwax.millisToDegrees(position), 360);
         msg_d.addFloatArg(temp_d);
-//        scratchMLfile.pushTag(ofToString(audioFrame));
-//        scratchMLfile.pushTag(name);
-//        scratchMLfile.addValue("degrees", temp_d);
-//        scratchMLfile.popTag();
-//        scratchMLfile.popTag();
     }
     hasM = false;
     return msg;
@@ -122,5 +109,12 @@ void deck::audioInputListener(float* input, int audioBuffersize){
     if(audioFrame % oscSubdivide == 0) {
         hasM = true;
     }
+    
+    scratchMLfile.pushTag(name);
+    scratchMLfile.pushTag("data");
+    scratchMLfile.addValue("p", xwax.getAbsolute());
+    scratchMLfile.popTag();
+    scratchMLfile.popTag();
+
     audioFrame++;
 }

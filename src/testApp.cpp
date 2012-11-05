@@ -31,8 +31,8 @@ void testApp::loadSettings() {
         settingsFile.addTag("audio");
         
         settingsFile.pushTag("audio");
-        settingsFile.addValue("sampleRate", 44100);
-        settingsFile.addValue("buffersize", 192);
+        settingsFile.addValue("samplerate", 44100);
+        settingsFile.addValue("buffersize", 512);
         settingsFile.addValue("interface", "");
         settingsFile.addValue("device", 1);
         settingsFile.popTag();
@@ -68,10 +68,10 @@ void testApp::loadSettings() {
     
     settingsFile.pushTag("audio");
     audioSamplerate = 44100;
-    audioSamplerate = settingsFile.getValue("sampleRate", 44100);
-    audioBuffersize = 512;
-    audioDevice = settingsFile.getValue("device", 1);
-    audioInterface = settingsFile.getValue("interface", "");
+    audioSamplerate = settingsFile.getValue("samplerate", 44100);
+    audioBuffersize = settingsFile.getValue("buffersize", 512);;
+    audioDevice = settingsFile.getValue("device", 0);
+    audioInterface = settingsFile.getValue("interface", "Apple Inc.: Built-in Input");
     settingsFile.popTag();
     
     settingsFile.pushTag("serial");
@@ -178,8 +178,8 @@ void testApp::setup() {
     //        c1.setup(audioDevice, nChannels, audioSamplerate, audioBuffersize, nChannels);
     ////    }
     //    cout<<"audioListener added"<<endl;
-    c1.setDeviceIdByName("Apple Inc.: Built-in Input");
-	c1.setup(0, 2, this, audioSamplerate, 512, nChannels);
+    c1.setDeviceIdByName(audioInterface);
+	c1.setup(0, 2, this, audioSamplerate, audioBuffersize, nChannels);
     ofAddListener(c1.audioReceivedEvent, this, &testApp::audioInputListener);
     //----soundStream-----_
     
