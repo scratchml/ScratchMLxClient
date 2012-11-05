@@ -11,7 +11,7 @@ void deck::setup(string foo, ofxXmlSettings &bar) {
 	ofSetDrawBitmapMode(OF_BITMAPMODE_MODEL_BILLBOARD);
 	ofSetCircleResolution(50);
 	ofSetLineWidth(2);	
-    xwax.setup(audioSamplerate, audioBuffersize, recordFormat);
+    xwax.setup(audioSamplerate, audioBuffersize, "serato_2a");
     audioFrame = 0;
     input.resize(audioBuffersize);
     name = foo;
@@ -99,6 +99,7 @@ ofxOscMessage deck::getMessage(){
 //        scratchMLfile.popTag();
 //        scratchMLfile.popTag();
     }
+    hasM = false;
     return msg;
 }
 
@@ -107,16 +108,17 @@ ofxOscMessage deck::getMessage(){
 void deck::audioInputListener(float* input, int audioBuffersize){	
     
     //xwax--------_
+    xwax.update(input);
+    
 	absolutePosition.push_back(xwax.getAbsolute());
 	relativePosition.push_back(xwax.getRelative());
-    
 	if(absolutePosition.size() > maxData) {
 		absolutePosition.pop_front();
 	}
 	if(relativePosition.size() > maxData) {
 		relativePosition.pop_front();
-	}   
-    //xwax
+	}
+    //----xwax----_
     
     if(audioFrame % oscSubdivide == 0) {
         hasM = true;

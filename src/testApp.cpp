@@ -32,7 +32,7 @@ void testApp::loadSettings() {
         
         settingsFile.pushTag("audio");
         settingsFile.addValue("sampleRate", 44100);
-        settingsFile.addValue("buffersize", 16);
+        settingsFile.addValue("buffersize", 192);
         settingsFile.addValue("interface", "");
         settingsFile.addValue("device", 1);
         settingsFile.popTag();
@@ -50,7 +50,7 @@ void testApp::loadSettings() {
     }
     settingsFile.pushTag("sml");
     settingsFile.pushTag("record");
-    recordFormat = settingsFile.getValue("format", "serato_2a");
+    recordFormat = settingsFile.getValue("format", "serato_cd");
     recordSide = settingsFile.getValue("side", "right");
     settingsFile.popTag();
     
@@ -70,7 +70,7 @@ void testApp::loadSettings() {
     audioSamplerate = 44100;
     audioBuffersize = 16;
     audioSamplerate = settingsFile.getValue("sampleRate", 44100);
-    audioBuffersize = settingsFile.getValue("buffersize", 16);
+    audioBuffersize = settingsFile.getValue("buffersize", 256);
     audioDevice = settingsFile.getValue("device", 1);
     audioInterface = settingsFile.getValue("interface", "");
     settingsFile.popTag();
@@ -171,12 +171,16 @@ void testApp::setup() {
     
     //soundStream---------_
 	c1.listDevices();
-	if(audioInterface != ""){
-        c1.setDeviceIdByName(audioInterface);
-    }else{
-        c1.setup(audioDevice, nChannels, audioSamplerate, audioBuffersize, nChannels);
-    }
-	ofAddListener(c1.audioReceivedEvent, this, &testApp::audioInputListener);
+//	if(audioInterface != ""){
+//        c1.setDeviceIdByName(audioInterface);
+//    }else{
+//        cout<<"setup"<<endl;
+//        c1.setup(audioDevice, nChannels, audioSamplerate, audioBuffersize, nChannels);
+////    }
+    //    cout<<"audioListener added"<<endl;
+    c1.setDeviceIdByName("Apple Inc.: Built-in Input");
+	c1.setup(0, 2, this, audioSamplerate, audioBuffersize, nChannels);
+    ofAddListener(c1.audioReceivedEvent, this, &testApp::audioInputListener);
     //----soundStream-----_
     
     //inputs-----------_
@@ -217,18 +221,20 @@ void testApp::setup() {
 }  
 
 void testApp::update() {
+    if(frame){
+        frame = false;
     for (int i = 0; i < totalDecks; i++) {
         //deck-----------_
         decks[i].update();
-        
+        decks[i].audioInputListener(&inputs[i][0], audioBuffersize);
         if(decks[i].hasMessage()){
             ofxOscMessage m =decks[i].getMessage();
             osc.sendMessage(m);
             if(m.getAddress() == "/scratch/record/deck0"){
-                step_R = ofMap(m., 0, 1800, -.9, .9);
+                step_R = ofMap(m.getArgAsFloat(0), 0, 1800, -.9, .9);
             }
             if(m.getAddress() == "/scratch/record/deck1"){
-                step_L = ofMap(count, 0, 1800, -.9, .9);
+                step_L = ofMap(m.getArgAsFloat(0), 0, 1800, -.9, .9);
             }
         }
         //------deck-----_
@@ -238,9 +244,6 @@ void testApp::update() {
         audioMutex.unlock();
         //-----graphicAudioInputs-----_
     }
-    count+=15;
-    if(count > 1800){
-        count = 0;
     }
     step_L = abs(step_L);
     step_R = abs(step_R);
@@ -354,6 +357,8 @@ void testApp::draw() {
 //--------------------------------------------------------------
 void testApp::audioInputListener(ofxAudioEventArgs &args){	
     
+    frame = true;
+    
     //inputs-----------_
     // samples are "interleaved"    
     int sample = 0;
@@ -368,12 +373,12 @@ void testApp::audioInputListener(ofxAudioEventArgs &args){
     
     //drawudioInput----------_
 	for (int i = 0; i < totalDecks; i++) {
-        
-        decks[i].xwax.update(&inputs[i][0]);
         audioMutex.lock();
         middleAudioBuffers[i].assign(&inputs[i][0], &inputs[i][0] + args.bufferSize * 2); 
-        audioMutex.unlock();
-        decks[i].audioInputListener(&inputs[i][0], audioBuffersize);
-        
+        audioMutex.unlock();        
     }
+}
+
+void testApp::audioReceived (float * input, int bufferSize, int nChannels){
+    
 }

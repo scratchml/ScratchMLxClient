@@ -14,7 +14,8 @@ public:
 	void update();
 	void draw();
 	void exit();
-    
+    void audioReceived 	(float * input, int bufferSize, int nChannels);
+    void audioInputListener (ofxAudioEventArgs &args);
     ofxXmlSettings scratchMLfile;
     ofxXmlSettings settingsFile;
     ofxOscSender osc;
@@ -47,7 +48,6 @@ public:
     //soundStream---------_
     vector< vector<float> > inputs;
     int nChannels, audioDevice;
-    void audioInputListener (ofxAudioEventArgs &args);
     ofxSoundStream c1;
     //----soundStream-----_
     
@@ -57,6 +57,6 @@ public:
     ofMutex audioMutex;
     //-----drawAudioInput-----_
     
-    
+    bool frame;
     
 };
