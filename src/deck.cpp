@@ -11,7 +11,7 @@ void deck::setup(string foo, ofxXmlSettings &bar) {
 	ofSetDrawBitmapMode(OF_BITMAPMODE_MODEL_BILLBOARD);
 	ofSetCircleResolution(50);
 	ofSetLineWidth(2);	
-    xwax.setup(audioSamplerate, audioBuffersize, "serato_2a");
+    xwax.setup(audioSamplerate, audioBuffersize, recordFormat);
     audioFrame = 0;
     input.resize(audioBuffersize);
     name = foo;
@@ -20,7 +20,6 @@ void deck::setup(string foo, ofxXmlSettings &bar) {
 
 
 void deck::draw(float newX, float newY) {
-
     x = newX;
     y = newY;
 	

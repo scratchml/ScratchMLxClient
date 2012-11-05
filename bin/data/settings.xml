@@ -1,17 +1,16 @@
 <sml>
     <record>
         <!--
-            format can be: serato_2a, serato_2b, serato_cd, traktor_a,
-            traktor_b, mixvibes_v2, mixvibes_7inch
-         -->
+    format can be: serato_2a, serato_2b, serato_cd, traktor_a,
+    traktor_b, mixvibes_v2, mixvibes_7inch
+  -->
         <format>serato_2a</format>
         <side>right</side>
         <!-- changes the OSC message address -->
     </record>
     <osc>
-        <!-- change to X.X.X.X.255 where XXX is your IP address -->
         <host>localhost</host>
-        <port>12234</port>
+        <port>8319</port>
         <subdivide>8</subdivide>
         <!-- send every Nth message from the vinyl -->
         <relative>0</relative>
@@ -21,33 +20,20 @@
         <degrees>0</degrees>
         <!-- send orientation in degrees -->
     </osc>
+    <!-- the samplerate/buffersize should match your audio settings -->
     <audio>
-        <!-- the samplerate/buffersize should match your audio settings -->
-        <sampleRate>44100</sampleRate>
-        <buffersize>16</buffersize>
-        <!-- Device Name -->
-        <interface />
-        <!-- if Device name is not present it will default 
-            to the device id on a mac the audio-in is device 1
-        -->
-        <device>1</device>
+        <samplerate>44100</samplerate>
+        <buffersize>512</buffersize>
     </audio>
-    <turntables>
-        <decks>1</decks>
-        <deck0>left</deck0>
-        <deck1>right</deck1>
-        <deck2>left_two</deck2>
-        <deck3>right_two</deck3>
-    </turntables>
-    <!-- serial is disabled -->
     <serial>
-        <!-- the arduino should report a stream of bytes on this port was tty.usbmodemfd121-->
-        <port>/dev/tty.usbmodem411</port>
+        <!-- the arduino should report a stream of bytes on this port -->
+        <port>tty.usbmodemfd121</port>
         <!--
-          when the serial data passes this threshold in either direction,
-          a 0 or 1 is sent over OSC. in the future, this should be double-ended
-          so that it sends 0, .5, or 1.
-        -->
+    when the serial data passes this threshold in either direction,
+    a 0 or 1 is sent over OSC. in the future, this should be double-ended
+    so that it sends 0, .5, or 1.
+  -->
         <threshold>240</threshold>
     </serial>
+    <sml />
 </sml>
