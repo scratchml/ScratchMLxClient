@@ -32,7 +32,7 @@ void testApp::loadSettings() {
         
         settingsFile.pushTag("audio");
         settingsFile.addValue("sampleRate", 44100);
-        settingsFile.addValue("buffersize", 192);
+        settingsFile.addValue("buffersize", 512);
         settingsFile.addValue("interface", "");
         settingsFile.addValue("device", 1);
         settingsFile.popTag();
@@ -70,7 +70,7 @@ void testApp::loadSettings() {
     audioSamplerate = 44100;
     audioBuffersize = 16;
     audioSamplerate = settingsFile.getValue("sampleRate", 44100);
-    audioBuffersize = settingsFile.getValue("buffersize", 256);
+    audioBuffersize = settingsFile.getValue("buffersize", 512);
     audioDevice = settingsFile.getValue("device", 1);
     audioInterface = settingsFile.getValue("interface", "");
     settingsFile.popTag();
@@ -144,6 +144,7 @@ void testApp::loadSettings() {
     }
     
     fatLogo.load("fatLogo.svg");
+    frame = false;
 }
 
 
