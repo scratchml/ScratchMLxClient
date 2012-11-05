@@ -18,12 +18,9 @@ void deck::setup(string foo, ofxXmlSettings &bar) {
     scratchMLfile = bar;
 }  
 
-void deck::update() {
-    graphVinyl.rotateAbsolute = ofxXwax::millisToDegrees(xwax.getAbsolute());
-    graphVinyl.rotateRelative = ofxXwax::millisToDegrees(xwax.getRelative());
-}
 
 void deck::draw(float newX, float newY) {
+
     x = newX;
     y = newY;
 	
@@ -119,6 +116,9 @@ void deck::audioInputListener(float* input, int audioBuffersize){
 		relativePosition.pop_front();
 	}
     //----xwax----_
+    
+    graphVinyl.rotateAbsolute = ofxXwax::millisToDegrees(xwax.getAbsolute());
+    graphVinyl.rotateRelative = ofxXwax::millisToDegrees(xwax.getRelative());
     
     if(audioFrame % oscSubdivide == 0) {
         hasM = true;
