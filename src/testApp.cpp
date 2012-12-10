@@ -164,20 +164,127 @@ void testApp::setup() {
     oscRate = (audioSamplerate / audioBuffersize) / oscSubdivide;
     
     osc.setup(oscHost, oscPort);
+    setupXwax();
     
+}  
+
+void testApp::update() {
+    for (int i = 0; i < totalDecks; i++) {            
+        audioMutex.lock();
+        graphicAudioInputs[i].frontAudioBuffer = middleAudioBuffers[i];
+        audioMutex.unlock();
+        
+        decks[i].audioInputListener(&inputs[i][0], audioBuffersize);
+        
+        if(decks[i].hasMessage() && frame){
+            frame = false;
+            ofxOscMessage m =decks[i].getMessage();
+            osc.sendMessage(m);
+        }
+    }
+}
+
+void testApp::exit(){
+    scratchMLfile.popTag();
+    scratchMLfile.popTag();
+    scratchMLfile.popTag();
+    scratchMLfile.popTag();
+    settingsFile.popTag();
+    settingsFile.popTag();
+    settingsFile.popTag();
+    scratchMLfile.saveFile();
+    settingsFile.saveFile();
+}
+
+void testApp::draw() {
+    
+    ofBackground(0);
+    ofNoFill();
+    if(!doneUp){
+        drawSetup();
+    }else{
+        drawXwax();
+    }
+    
+}
+
+
+void testApp::drawSetup(){
+    
+    if(step == 1 && count <= 240){
+        count++;
+    }else{
+        if(count >= 240){
+            doneUp = true;
+        }
+        if(up){
+            step +=0.0015;
+        }else{
+            step -=0.0015;
+        }
+        if(step <= 0){
+            up = true;
+            step+=0.0015;
+        }
+        if(step >= 1){
+            up = false;
+            step = 1;
+        }
+    }
+    
+    ofPushMatrix();
+    ofTranslate(ofGetWidth()/2 - fatLogo.getWidth()*2.5/2, ofGetHeight()/2 - fatLogo.getHeight()*2.5/2);
+    ofScale(2.5, 2.5);
+    for (int i = 0; i < fatLogo.getNumPath(); i++)
+    {
+        ofPath &p = fatLogo.getPathAt(i);
+        p.setColor(fatLogo.getPathAt(i).getFillColor());
+        vector<ofPolyline>& lines = p.getOutline();
+        
+        for (int k = 0; k < lines.size(); k++)
+        {
+            ofPolyline line = lines[k].getResampledBySpacing(1);
+            
+            int num = step * line.size();
+            
+            glBegin(GL_LINE_STRIP);
+            for (int j = 0; j < num; j++)
+            {
+                ofVec3f &vv = line[j];
+                ofSetColor(p.getFillColor());
+                glVertex3f(vv.x, vv.y, vv.z);
+            }
+            glEnd();
+        }
+    }
+    ofPopMatrix();
+}
+
+void testApp::drawXwax(){
+    for (int i = 0; i < totalDecks; i++) {
+        if (i == 0) {
+            cellHeight = 0; 
+        }else{
+            cellHeight = cellHeight + incrementCellHeight;
+        }
+        //deck-----------_
+        decks[i].draw(0,cellHeight);
+        //------deck-----_
+        //graphicAudioInputs----------_
+        graphicAudioInputs[i].draw(10, cellHeight+10, 128);
+        //-----graphicAudioInputs-----_
+    }
+    
+}
+
+
+bool testApp::setupXwax(){
     audioFrame = 0;
     totalDecks = 1;
     nChannels = totalDecks * 2;
     
     //soundStream---------_
 	c1.listDevices();
-    //	if(audioInterface != ""){
-    //        c1.setDeviceIdByName(audioInterface);
-    //    }else{
-    //        cout<<"setup"<<endl;
-    //        c1.setup(audioDevice, nChannels, audioSamplerate, audioBuffersize, nChannels);
-    ////    }
-    //    cout<<"audioListener added"<<endl;
     c1.setDeviceIdByName(audioInterface);
 	c1.setup(0, 2, this, audioSamplerate, audioBuffersize, nChannels);
     ofAddListener(c1.audioReceivedEvent, this, &testApp::audioInputListener);
@@ -218,149 +325,14 @@ void testApp::setup() {
         //-----graphicAudioInputs-----_
     }
     
-}  
-
-void testApp::update() {
-
-        for (int i = 0; i < totalDecks; i++) {
-            
-            
-            
-            
-            audioMutex.lock();
-            graphicAudioInputs[i].frontAudioBuffer = middleAudioBuffers[i];
-            audioMutex.unlock();
-        
-            decks[i].audioInputListener(&inputs[i][0], audioBuffersize);
-            
-            if(decks[i].hasMessage() && frame){
-                ofxOscMessage m =decks[i].getMessage();
-                osc.sendMessage(m);
-                if(m.getAddress() == "/scratch/record/deck0"){
-                    step_R = ofMap(m.getArgAsFloat(0), 0, 1800, -.9, .9);
-                }
-                if(m.getAddress() == "/scratch/record/deck1"){
-                    step_L = ofMap(m.getArgAsFloat(0), 0, 1800, -.9, .9);
-                }
-            }
-        }
- 
-    step_L = abs(step_L);
-    step_R = abs(step_R);
+    return true;
 }
 
-void testApp::exit(){
-    scratchMLfile.popTag();
-    scratchMLfile.popTag();
-    scratchMLfile.popTag();
-    scratchMLfile.popTag();
-    settingsFile.popTag();
-    settingsFile.popTag();
-    settingsFile.popTag();
-    scratchMLfile.saveFile();
-    settingsFile.saveFile();
-}
 
-void testApp::draw() {
-    if(frame){
-        ofBackground(0);
-        ofNoFill();
-        
-        for (int i = 0; i < totalDecks; i++) {
-            if (i == 0) {
-                cellHeight = 0; 
-            }else{
-                cellHeight = cellHeight + incrementCellHeight;
-            }
-            //deck-----------_
-            decks[i].draw(0,cellHeight);
-            //------deck-----_
-            //graphicAudioInputs----------_
-            graphicAudioInputs[i].draw(10, cellHeight+10, 128);
-            //-----graphicAudioInputs-----_
-        }
-        frame = false;
-    }
-    //fader--------_
-    //    ofPushMatrix();
-    //    ofSetColor(255);
-    //    drawFader.draw(faderPosition, 128, 0, 255);
-    //	ofPopMatrix();
-    //    
-    //    ofPushMatrix();
-    //	ofTranslate(ofGetWidth()-10-fatLogo.getWidth(), ofGetHeight()-10-fatLogo.getHeight());
-    //
-    //    if(step_R < 1 && step_R != 0){
-    //    for (int i = 0; i < fatLogo.getNumPath(); i++)
-    //    {
-    //        ofPath &p = fatLogo.getPathAt(i);
-    //        ofColor c = fatLogo.getPathAt(i).getFillColor();
-    //        vector<ofPolyline>& lines = p.getOutline();
-    //        
-    //        for (int k = 0; k < lines.size(); k++)
-    //        {
-    //            ofPolyline line = lines[k].getResampledBySpacing(1);
-    //            line = line.getSmoothed(1);
-    //            
-    //            int num = step_R * line.size();
-    //            if(step_R == 0){
-    //                num = line.size();
-    //            }
-    //            glBegin(GL_LINE_STRIP);
-    //            for (int j = 0; j < num; j++)
-    //            {
-    //                ofVec3f &vv = line[j];
-    //                ofSetColor(c);
-    //                glVertex3f(vv.x, vv.y, vv.z);
-    //            }
-    //            glEnd();
-    //        }
-    //    }
-    //    }else{
-    //        fatLogo.draw();
-    //    }
-    //    ofPopMatrix();
-    //    
-    //    ofPushMatrix();
-    //	ofTranslate(10, ofGetHeight()-10-fatLogo.getHeight());
-    //
-    //    if(step_L < 1 && step_L != 0){
-    //    for (int i = 0; i < fatLogo.getNumPath(); i++)
-    //    {
-    //        ofPath &p = fatLogo.getPathAt(i);
-    //        ofColor c = fatLogo.getPathAt(i).getFillColor();
-    //        vector<ofPolyline>& lines = p.getOutline();
-    //        for (int k = 0; k < lines.size(); k++)
-    //        {
-    //            ofPolyline line = lines[k].getResampledBySpacing(.125);
-    //            line = line.getSmoothed(1);
-    //            
-    //            int num = step_R * line.size();
-    //            if(step_L == 0){
-    //                num = line.size();
-    //            }
-    //            
-    //            
-    //            glBegin(GL_LINE_STRIP);
-    //            for (int j = 0; j < num; j++)
-    //            {
-    //                ofVec3f &vv = line[j];
-    //                ofSetColor(c);
-    //                glVertex3f(vv.x, vv.y, vv.z);
-    //            }
-    //            glEnd();
-    //        }
-    //    }
-    //    }else{
-    //        fatLogo.draw();
-    //    }
-    //    ofPopMatrix();
-}
 
 //--------------------------------------------------------------
 void testApp::audioInputListener(ofxAudioEventArgs &args){	
     frame = true;
-    
     //inputs-----------_
     // samples are "interleaved"    
     int sample = 0;
@@ -371,11 +343,6 @@ void testApp::audioInputListener(ofxAudioEventArgs &args){
             inputs[c][k + 1] = args.buffer[sample++];
         }
     }
-    //------inputs-----_
-    for(int i = 0; i < totalDecks; i++){
-       
-    }
-
     
     //drawudioInput----------_
 	for (int i = 0; i < totalDecks; i++) {
@@ -383,9 +350,5 @@ void testApp::audioInputListener(ofxAudioEventArgs &args){
         middleAudioBuffers[i].assign(&inputs[i][0], &inputs[i][0] + args.bufferSize * nChannels); 
         audioMutex.unlock();
     }
-    
-}
-
-void testApp::audioReceived (float * input, int bufferSize, int nChannels){
     
 }

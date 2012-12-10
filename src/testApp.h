@@ -14,8 +14,10 @@ public:
 	void update();
 	void draw();
 	void exit();
-    void audioReceived 	(float * input, int bufferSize, int nChannels);
     void audioInputListener (ofxAudioEventArgs &args);
+    bool setupXwax();
+    void drawXwax();
+    void drawSetup();
     ofxXmlSettings scratchMLfile;
     ofxXmlSettings settingsFile;
     ofxOscSender osc;
@@ -36,8 +38,9 @@ public:
     
     deque<float> faderPosition;
     
-    float step_R;
-    float step_L;
+    bool up;
+    bool doneUp;
+    float step;
     int count;
     //deck-----------_
     int totalDecks;
