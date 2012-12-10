@@ -148,25 +148,16 @@ void testApp::loadSettings() {
 
 
 void testApp::setup() {
-	ofSetWindowTitle("ScratchML");
-	ofSetVerticalSync(true);
-	ofSetDrawBitmapMode(OF_BITMAPMODE_MODEL_BILLBOARD);
 	ofSetCircleResolution(150);
 	ofSetLineWidth(1);
-    
 	loadSettings();
-    
-    
     //fader--------_
     //serialReady = serial.setup(serialPort, 115200);
     //----fader----_
-    
     oscRate = (audioSamplerate / audioBuffersize) / oscSubdivide;
-    
     osc.setup(oscHost, oscPort);
     setupXwax();
-    
-}  
+}
 
 void testApp::update() {
     for (int i = 0; i < totalDecks; i++) {            
@@ -232,32 +223,6 @@ void testApp::drawSetup(){
         }
     }
     
-    ofPushMatrix();
-    ofTranslate(ofGetWidth()/2 - fatLogo.getWidth()*2.5/2, ofGetHeight()/2 - fatLogo.getHeight()*2.5/2);
-    ofScale(2.5, 2.5);
-    for (int i = 0; i < fatLogo.getNumPath(); i++)
-    {
-        ofPath &p = fatLogo.getPathAt(i);
-        p.setColor(fatLogo.getPathAt(i).getFillColor());
-        vector<ofPolyline>& lines = p.getOutline();
-        
-        for (int k = 0; k < lines.size(); k++)
-        {
-            ofPolyline line = lines[k].getResampledBySpacing(1);
-            
-            int num = step * line.size();
-            
-            glBegin(GL_LINE_STRIP);
-            for (int j = 0; j < num; j++)
-            {
-                ofVec3f &vv = line[j];
-                ofSetColor(p.getFillColor());
-                glVertex3f(vv.x, vv.y, vv.z);
-            }
-            glEnd();
-        }
-    }
-    ofPopMatrix();
 }
 
 void testApp::drawXwax(){

@@ -23,13 +23,10 @@ public:
     ofxOscSender osc;
 	ofSerial serial;
 	graphicCurve drawFader;
-    
     ofxSVG fatLogo;
-    
 	bool serialReady;
 	unsigned char serialThreshold;
 	bool overThreshold;
-	
 	string recordFormat, recordSide, oscHost, serialPort, audioInterface;
 	unsigned int oscPort, oscSubdivide, audioSamplerate, audioBuffersize;
 	float oscRate;
