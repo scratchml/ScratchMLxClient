@@ -3,33 +3,22 @@
 static const int maxData = 512;
 
 void testApp::loadSettings() {
-	
-    
 	settingsFile.loadFile("settings.xml");
     unsigned long systemtime = ofGetSystemTime();
-    
     if(settingsFile.getNumTags("sml") != 1){
-        
         settingsFile.addTag("sml");
-        
         settingsFile.pushTag("sml");
-        
         settingsFile.addTag("record");
-        
         settingsFile.pushTag("record");
         settingsFile.addValue("format", "serato_2a");
         settingsFile.addValue("side","right");
         settingsFile.popTag();
-        
         settingsFile.addTag("osc");
-        
         settingsFile.pushTag("osc");
         settingsFile.addValue("host", "10.0.0.255");
         settingsFile.addValue("port","12234");
         settingsFile.popTag();
-        
         settingsFile.addTag("audio");
-        
         settingsFile.pushTag("audio");
         settingsFile.addValue("samplerate", 44100);
         settingsFile.addValue("buffersize", 512);
@@ -44,7 +33,6 @@ void testApp::loadSettings() {
         settingsFile.addValue("deck2", "left_two");
         settingsFile.addValue("deck3", "right_two");
         settingsFile.popTag();
-        
         settingsFile.addTag("serial");
         settingsFile.popTag();
     }
@@ -53,7 +41,6 @@ void testApp::loadSettings() {
     recordFormat = settingsFile.getValue("format", "serato_2a");
     recordSide = settingsFile.getValue("side", "right");
     settingsFile.popTag();
-    
     settingsFile.pushTag("osc");
     oscHost = settingsFile.getValue("host", "255.255.255.255");
     oscPort = settingsFile.getValue("port", 1235);
@@ -62,10 +49,8 @@ void testApp::loadSettings() {
     oscRelative = settingsFile.getValue("relative", 0);
     oscDegrees = settingsFile.getValue("degrees", 0);
     settingsFile.popTag();
-    
     settingsFile.pushTag("turntables");
     totalDecks = settingsFile.getValue("decks", 1);
-    
     settingsFile.pushTag("audio");
     audioSamplerate = 44100;
     audioSamplerate = settingsFile.getValue("samplerate", 44100);
@@ -73,17 +58,13 @@ void testApp::loadSettings() {
     audioDevice = settingsFile.getValue("device", 0);
     audioInterface = settingsFile.getValue("interface", "Apple Inc.: Built-in Input");
     settingsFile.popTag();
-    
     settingsFile.pushTag("serial");
     serialPort = settingsFile.getValue("port", "");
     serialThreshold = settingsFile.getValue("threshold", 0);
     settingsFile.popTag();
     settingsFile.popTag();
-    
-    
     string filename = "session-"+ofToString(systemtime)+".xml";
     scratchMLfile.loadFile(filename);
-    
     if(scratchMLfile.getNumTags("sml") == 0){
         //sml header
         scratchMLfile.addTag("sml");
@@ -95,8 +76,7 @@ void testApp::loadSettings() {
         scratchMLfile.addValue("major", 0);
         scratchMLfile.addValue("minor", 6);
         scratchMLfile.popTag();
-        //end version 
-        
+        //end version
         //client about
         scratchMLfile.addTag("about");
         scratchMLfile.pushTag("about");
@@ -106,8 +86,6 @@ void testApp::loadSettings() {
         scratchMLfile.addValue("github", "https://github.com/scratchml");
         scratchMLfile.popTag();
         //client end about
-        
-        
         //define audio sample, filename, description, deck, start, end time
         scratchMLfile.addTag("audio");
         scratchMLfile.pushTag("audio");
@@ -120,10 +98,8 @@ void testApp::loadSettings() {
         scratchMLfile.addValue("stop","connect me ot the GUI");
         scratchMLfile.popTag();
         scratchMLfile.popTag();
-        
         scratchMLfile.addTag("performance");
         scratchMLfile.pushTag("performance");
-        
         scratchMLfile.addTag("turntable");
         scratchMLfile.pushTag("turntable");
         scratchMLfile.addTag("deck0");
@@ -141,8 +117,6 @@ void testApp::loadSettings() {
         scratchMLfile.pushTag("performance");
         scratchMLfile.pushTag("turntable");
     }
-    
-    fatLogo.load("fatLogo.svg");
     frame = false;
 }
 
@@ -160,13 +134,13 @@ void testApp::setup() {
 }
 
 void testApp::update() {
-    for (int i = 0; i < totalDecks; i++) {            
+    for (int i = 0; i < totalDecks; i++) {
         audioMutex.lock();
         graphicAudioInputs[i].frontAudioBuffer = middleAudioBuffers[i];
         audioMutex.unlock();
-        
+
         decks[i].audioInputListener(&inputs[i][0], audioBuffersize);
-        
+
         if(decks[i].hasMessage() && frame){
             frame = false;
             ofxOscMessage m =decks[i].getMessage();
@@ -188,20 +162,14 @@ void testApp::exit(){
 }
 
 void testApp::draw() {
-    
+
     ofBackground(0);
     ofNoFill();
-    if(!doneUp){
-        drawSetup();
-    }else{
-        drawXwax();
-    }
-    
+    drawXwax();
 }
 
 
 void testApp::drawSetup(){
-    
     if(step == 1 && count <= 240){
         count++;
     }else{
@@ -222,41 +190,40 @@ void testApp::drawSetup(){
             step = 1;
         }
     }
-    
 }
 
 void testApp::drawXwax(){
     for (int i = 0; i < totalDecks; i++) {
-        if (i == 0) {
-            cellHeight = 0; 
-        }else{
-            cellHeight = cellHeight + incrementCellHeight;
-        }
         //deck-----------_
-        decks[i].draw(0,cellHeight);
-        //------deck-----_
+	if(i == 0)
+	{
+		decks[i].draw(0,ofGetScreenHeight()-200);
+		graphicAudioInputs[i].draw(15, ofGetScreenHeight()-200, 128);
+	}
+	else
+	{
+	decks[i].draw(ofGetScreenWidth()/2+15, ofGetScreenHeight()-200);
+	//------deck-----_
         //graphicAudioInputs----------_
-        graphicAudioInputs[i].draw(10, cellHeight+10, 128);
+        graphicAudioInputs[i].draw(ofGetScreenWidth()/2+15, ofGetScreenHeight()-200, 128);
         //-----graphicAudioInputs-----_
+	}
     }
-    
 }
 
 
-bool testApp::setupXwax(){
+void testApp::setupXwax(){
     audioFrame = 0;
     totalDecks = 1;
     nChannels = totalDecks * 2;
-    
     //soundStream---------_
 	c1.listDevices();
     c1.setDeviceIdByName(audioInterface);
 	c1.setup(0, 2, this, audioSamplerate, audioBuffersize, nChannels);
     ofAddListener(c1.audioReceivedEvent, this, &testApp::audioInputListener);
     //----soundStream-----_
-    
     //inputs-----------_
-    incrementCellHeight = 150;
+    incrementCellHeight = ofGetScreenHeight()/5;
     inputs.resize(nChannels);
     middleAudioBuffers.resize(nChannels);
     for(int c = 0; c < nChannels; c++) {
@@ -264,9 +231,7 @@ bool testApp::setupXwax(){
         middleAudioBuffers[c].resize(audioBuffersize * 2);
     }
     //------inputs-----_
-    
     osc.setup(oscHost, oscPort);
-    
     for (int i = 0; i < totalDecks; i++) {
         //deck-----------_
         deck myDeck;
@@ -281,25 +246,21 @@ bool testApp::setupXwax(){
         myDeck.setup("deck"+ofToString(i), scratchMLfile);
         decks.push_back(myDeck);
         //------deck-----_
-        
         //graphicAudioInputs----------_
         graphicAudioInput myGraphicAudioInput;
-        myGraphicAudioInput.setup(audioBuffersize);    
+        myGraphicAudioInput.setup(audioBuffersize);
         myGraphicAudioInput.audioBuffersize = audioBuffersize;
         graphicAudioInputs.push_back(myGraphicAudioInput);
         //-----graphicAudioInputs-----_
     }
-    
-    return true;
 }
 
 
 
 //--------------------------------------------------------------
-void testApp::audioInputListener(ofxAudioEventArgs &args){	
-    frame = true;
+void testApp::audioInputListener(ofxAudioEventArgs &args){    frame = true;
     //inputs-----------_
-    // samples are "interleaved"    
+    // samples are "interleaved"
     int sample = 0;
     for(int i = 0; i < args.bufferSize; i++) {
         int k = i * 2; // 2 for stereo
@@ -308,12 +269,10 @@ void testApp::audioInputListener(ofxAudioEventArgs &args){
             inputs[c][k + 1] = args.buffer[sample++];
         }
     }
-    
     //drawudioInput----------_
 	for (int i = 0; i < totalDecks; i++) {
         audioMutex.lock();
         middleAudioBuffers[i].assign(&inputs[i][0], &inputs[i][0] + args.bufferSize * nChannels); 
         audioMutex.unlock();
     }
-    
 }

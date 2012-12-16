@@ -5,7 +5,6 @@
 
 #include "ofxXmlSettings.h"
 #include "ofxOsc.h"
-#include "ofxSVG.h"
 
 //graphic
 #include "graphicVinyl.h"
