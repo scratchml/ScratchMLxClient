@@ -69,7 +69,7 @@ void testApp::loadSettings() {
     settingsFile.pushTag("audio");
     audioSamplerate = 44100;
     audioSamplerate = settingsFile.getValue("samplerate", 44100);
-    audioBuffersize = settingsFile.getValue("buffersize", 512);;
+    audioBuffersize = 256;
     audioDevice = settingsFile.getValue("device", 0);
     audioInterface = settingsFile.getValue("interface", "Apple Inc.: Built-in Input");
     settingsFile.popTag();
@@ -142,7 +142,7 @@ void testApp::loadSettings() {
         scratchMLfile.pushTag("turntable");
     }
     
-    fatLogo.load("fatLogo.svg");
+    
     frame = false;
 }
 
@@ -156,7 +156,7 @@ void testApp::setup() {
     
 	loadSettings();
     
-    
+    xwax.setup(audioSamplerate, 256, recordFormat);    
     //fader--------_
     //serialReady = serial.setup(serialPort, 115200);
     //----fader----_
@@ -164,17 +164,72 @@ void testApp::setup() {
     oscRate = (audioSamplerate / audioBuffersize) / oscSubdivide;
     
     osc.setup(oscHost, oscPort);
-    setupXwax();
+    
+    audioFrame = 0;
+    totalDecks = 2;
+    nChannels = totalDecks * 2;
+    
+    //soundStream---------_
+	c1.listDevices();
+    c1.setDeviceID(3);
+    c1.setup(this, 0, 4, 44100, 256, 4);
+    //----soundStream-----_
+    
+    //inputs-----------_
+    incrementCellHeight = 150;
+    inputs.resize(nChannels);
+    middleAudioBuffers.resize(nChannels);
+    vector<float> temp;
+    vector<float> temp1;
+    inputs.push_back(temp);
+    inputs.push_back(temp1);
+    for(int c = 0; c < nChannels; c++) {
+        inputs[c].resize(audioBuffersize*2); // 2 for stereo
+        middleAudioBuffers[c].resize(audioBuffersize*2);
+    }
+    //------inputs-----_
+    
+    osc.setup(oscHost, oscPort);
+    
+    for (int i = 0; i < totalDecks; i++) {
+        //deck-----------_
+        deck myDeck = deck();
+        myDeck.audioSamplerate = audioSamplerate;
+        myDeck.audioBuffersize = audioBuffersize;
+        myDeck.audioInterface = audioInterface;
+        myDeck.nChannels = nChannels;
+        myDeck.recordFormat = recordFormat;
+        myDeck.recordSide = recordSide;
+        myDeck.serialPort = serialPort;
+        myDeck.serialThreshold = serialThreshold;
+        myDeck.setup("deck"+ofToString(i), scratchMLfile, xwax);
+        decks.push_back(myDeck);
+        //------deck-----_
+        
+        //graphicAudioInputs----------_
+        graphicAudioInput myGraphicAudioInput;
+        myGraphicAudioInput.setup(audioBuffersize);    
+        myGraphicAudioInput.audioBuffersize = audioBuffersize;
+        graphicAudioInputs.push_back(myGraphicAudioInput);
+        //-----graphicAudioInputs-----_
+    }
+    
     
 }  
 
 void testApp::update() {
-    for (int i = 0; i < totalDecks; i++) {            
+    for (int i = 0; i < totalDecks; i++) {    
+        
+        
+       
         audioMutex.lock();
         graphicAudioInputs[i].frontAudioBuffer = middleAudioBuffers[i];
         audioMutex.unlock();
+
+        if(frame){
+            decks[i].audioInputListener(&inputs[i][0], audioBuffersize);
+        }
         
-        decks[i].audioInputListener(&inputs[i][0], audioBuffersize);
         
         if(decks[i].hasMessage() && frame){
             frame = false;
@@ -200,9 +255,9 @@ void testApp::draw() {
     
     ofBackground(0);
     ofNoFill();
-    if(!doneUp){
-        drawSetup();
-    }else{
+    
+    
+    if(ofGetElapsedTimef() > 10){
         drawXwax();
     }
     
@@ -231,124 +286,46 @@ void testApp::drawSetup(){
             step = 1;
         }
     }
-    
-    ofPushMatrix();
-    ofTranslate(ofGetWidth()/2 - fatLogo.getWidth()*2.5/2, ofGetHeight()/2 - fatLogo.getHeight()*2.5/2);
-    ofScale(2.5, 2.5);
-    for (int i = 0; i < fatLogo.getNumPath(); i++)
-    {
-        ofPath &p = fatLogo.getPathAt(i);
-        p.setColor(fatLogo.getPathAt(i).getFillColor());
-        vector<ofPolyline>& lines = p.getOutline();
-        
-        for (int k = 0; k < lines.size(); k++)
-        {
-            ofPolyline line = lines[k].getResampledBySpacing(1);
-            
-            int num = step * line.size();
-            
-            glBegin(GL_LINE_STRIP);
-            for (int j = 0; j < num; j++)
-            {
-                ofVec3f &vv = line[j];
-                ofSetColor(p.getFillColor());
-                glVertex3f(vv.x, vv.y, vv.z);
-            }
-            glEnd();
-        }
-    }
-    ofPopMatrix();
 }
 
 void testApp::drawXwax(){
-    for (int i = 0; i < totalDecks; i++) {
-        if (i == 0) {
-            cellHeight = 0; 
-        }else{
-            cellHeight = cellHeight + incrementCellHeight;
-        }
+    cellHeight = 0;
+    for (int i = 0; i < 2; i++) {
         //deck-----------_
         decks[i].draw(0,cellHeight);
         //------deck-----_
         //graphicAudioInputs----------_
         graphicAudioInputs[i].draw(10, cellHeight+10, 128);
         //-----graphicAudioInputs-----_
+        cellHeight+= incrementCellHeight;
     }
     
 }
 
 
-bool testApp::setupXwax(){
-    audioFrame = 0;
-    totalDecks = 1;
-    nChannels = totalDecks * 2;
-    
-    //soundStream---------_
-	c1.listDevices();
-    c1.setDeviceIdByName(audioInterface);
-	c1.setup(0, 2, this, audioSamplerate, audioBuffersize, nChannels);
-    ofAddListener(c1.audioReceivedEvent, this, &testApp::audioInputListener);
-    //----soundStream-----_
-    
-    //inputs-----------_
-    incrementCellHeight = 150;
-    inputs.resize(nChannels);
-    middleAudioBuffers.resize(nChannels);
-    for(int c = 0; c < nChannels; c++) {
-        inputs[c].resize(audioBuffersize * 2); // 2 for stereo
-        middleAudioBuffers[c].resize(audioBuffersize * 2);
-    }
-    //------inputs-----_
-    
-    osc.setup(oscHost, oscPort);
-    
-    for (int i = 0; i < totalDecks; i++) {
-        //deck-----------_
-        deck myDeck;
-        myDeck.audioSamplerate = audioSamplerate;
-        myDeck.audioBuffersize = audioBuffersize;
-        myDeck.audioInterface = audioInterface;
-        myDeck.nChannels = nChannels;
-        myDeck.recordFormat = recordFormat;
-        myDeck.recordSide = recordSide;
-        myDeck.serialPort = serialPort;
-        myDeck.serialThreshold = serialThreshold;
-        myDeck.setup("deck"+ofToString(i), scratchMLfile);
-        decks.push_back(myDeck);
-        //------deck-----_
-        
-        //graphicAudioInputs----------_
-        graphicAudioInput myGraphicAudioInput;
-        myGraphicAudioInput.setup(audioBuffersize);    
-        myGraphicAudioInput.audioBuffersize = audioBuffersize;
-        graphicAudioInputs.push_back(myGraphicAudioInput);
-        //-----graphicAudioInputs-----_
-    }
-    
-    return true;
-}
 
-
-
-//--------------------------------------------------------------
-void testApp::audioInputListener(ofxAudioEventArgs &args){	
+void testApp::audioIn(float * input, int bufferSize, int nChannel){
     frame = true;
     //inputs-----------_
     // samples are "interleaved"    
+
     int sample = 0;
-    for(int i = 0; i < args.bufferSize; i++) {
+    for(int i = 0; i < bufferSize; i++) {
         int k = i * 2; // 2 for stereo
         for(int c = 0; c < nChannels; c++) {
-            inputs[c][k + 0] = args.buffer[sample++];
-            inputs[c][k + 1] = args.buffer[sample++];
+            inputs[c][k + 0] = input[sample++];
+            inputs[c][k + 1] = input[sample++];
         }
-    }
+    }    
     
     //drawudioInput----------_
-	for (int i = 0; i < totalDecks; i++) {
+	for (int i = 0; i < nChannel; i++) {
         audioMutex.lock();
-        middleAudioBuffers[i].assign(&inputs[i][0], &inputs[i][0] + args.bufferSize * nChannels); 
+        middleAudioBuffers[i].assign(&inputs[i][0], &inputs[i][0] + bufferSize * nChannels); 
         audioMutex.unlock();
     }
     
+
+    
 }
+

@@ -15,7 +15,8 @@
 
 class deck : public ofNode{
 public:
-	void setup(string foo, ofxXmlSettings &bar);
+    deck();
+	void setup(string foo, ofxXmlSettings &bar, ofxXwax &vinyl);
 	void update();
 	void draw(float newX, float newY);
     void audioInputListener(float* input, int audioBuffersize);
@@ -49,7 +50,9 @@ public:
     graphicCurve graphCurve;
     
 	deque<float> absolutePosition, relativePosition, faderPosition;
-	
+	float currentPostion, currentRelativePos, currentFaderPos;
+    float currentPitch, currentVelocity;
+    
 	unsigned int audioFrame;
     
     vector<float> input;

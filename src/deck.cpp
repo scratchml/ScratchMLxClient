@@ -4,18 +4,24 @@ static const ofColor cyanPrint = ofColor::fromHex(0x00abec);
 static const ofColor magentaPrint = ofColor::fromHex(0xec008c);
 static const ofColor yellowPrint = ofColor::fromHex(0xffee00);
 static const int maxData = 512;
+deck::deck(){
+    
+}
 
-void deck::setup(string foo, ofxXmlSettings &bar) {
-    ofSetWindowTitle("ScratchOSC");
-	ofSetVerticalSync(true);
-	ofSetDrawBitmapMode(OF_BITMAPMODE_MODEL_BILLBOARD);
-	ofSetCircleResolution(50);
+
+void deck::setup(string foo, ofxXmlSettings &bar, ofxXwax &vinyl) {
+    ofSetCircleResolution(50);
 	ofSetLineWidth(2);	
-    xwax.setup(audioSamplerate, audioBuffersize, recordFormat);
+    xwax = vinyl;
     audioFrame = 0;
+    oscSubdivide = 8;
     input.resize(audioBuffersize);
     name = foo;
     scratchMLfile = bar;
+    currentPostion = 0;
+    currentRelativePos = 0;
+    currentPitch = 0;
+    currentVelocity = 0;
 }  
 
 
@@ -23,8 +29,16 @@ void deck::draw(float newX, float newY) {
     x = newX;
     y = newY;
 	
-    ofBackground(0);
+    
+    
+    
 	ofNoFill();
+    
+    ofPushMatrix();
+    ofSetColor(255, 255, 0);
+    ofTranslate(10+x, 10+y);
+    ofRect(0, 0, 10, 10);
+    ofPopMatrix();
     
     ofPushMatrix();
 	ofTranslate(10+x, 10+y);
@@ -45,12 +59,12 @@ void deck::draw(float newX, float newY) {
 	ofSetColor(255);
 	ofPushMatrix();
 	ofTranslate(790+x, 10+y);
-	ofDrawBitmapString("pitch: " + ofToString(xwax.getPitch(), 2) + "x", 0, 20);
-	ofDrawBitmapString("velocity: " + ofToString(xwax.getVelocity(), 2) + " ms", 0, 40);
+	ofDrawBitmapString("pitch: " + ofToString(currentPitch, 2) + "x", 0, 20);
+	ofDrawBitmapString("velocity: " + ofToString(currentVelocity, 2) + " ms", 0, 40);
     ofSetColor(magentaPrint);
-	ofDrawBitmapString("relative: " + ofToString(xwax.getRelative(), 0) + " ms", 0, 60);
+	ofDrawBitmapString("relative: " + ofToString(currentRelativePos, 0) + " ms", 0, 60);
     ofSetColor(yellowPrint);
-	ofDrawBitmapString("absolute: " + ofToString(xwax.getAbsolute(), 0) + " ms", 0, 80);
+	ofDrawBitmapString("absolute: " + ofToString(currentPostion, 0) + " ms", 0, 80);
     ofSetColor(255);
 	ofDrawBitmapString("absolute valid: " + ofToString(xwax.isAbsoluteValid() ? "yes" : "no"), 0, 100);
 	ofPopMatrix();
@@ -64,7 +78,7 @@ bool deck::hasMessage(){
 
 
 ofxOscMessage deck::getMessage(){
-    float position = oscRelative?xwax.getRelative():xwax.getAbsolute();
+    float position = oscRelative?currentRelativePos:currentPostion;
     ofxOscMessage msg;
     msg.setAddress("/scratch/record/" + name);
     msg.addFloatArg(position);
@@ -73,7 +87,7 @@ ofxOscMessage deck::getMessage(){
     if(oscPitch) {
         ofxOscMessage msg_p;
         msg_p.setAddress("/scratch/record/" + name + "/pitch");
-        msg_p.addFloatArg(xwax.getPitch());
+        msg_p.addFloatArg(currentPitch);
         
     }
     if(oscDegrees) {
@@ -91,20 +105,25 @@ ofxOscMessage deck::getMessage(){
 void deck::audioInputListener(float* input, int audioBuffersize){	
     
     //xwax--------_
-    xwax.update(input);
-    
-	absolutePosition.push_back(xwax.getAbsolute());
-	relativePosition.push_back(xwax.getRelative());
-	if(absolutePosition.size() > maxData) {
-		absolutePosition.pop_front();
-	}
-	if(relativePosition.size() > maxData) {
-		relativePosition.pop_front();
-	}
+    vector<float> vinyl = xwax.update(input);
+    if(vinyl.size() > 0){
+        currentPostion = vinyl[0];
+        currentRelativePos = vinyl[1];
+        currentPitch = vinyl[2];
+        currentVelocity = vinyl[3];
+    }
+    absolutePosition.push_back(currentPostion);
+    relativePosition.push_back(currentRelativePos);
+    if(absolutePosition.size() > maxData) {
+        absolutePosition.pop_front();
+    }
+    if(relativePosition.size() > maxData) {
+        relativePosition.pop_front();
+    }
     //----xwax----_
     
-    graphVinyl.rotateAbsolute = ofxXwax::millisToDegrees(xwax.getAbsolute());
-    graphVinyl.rotateRelative = ofxXwax::millisToDegrees(xwax.getRelative());
+    graphVinyl.rotateAbsolute = ofxXwax::millisToDegrees(currentPostion);
+    graphVinyl.rotateRelative = ofxXwax::millisToDegrees(currentRelativePos);
     
     if(audioFrame % oscSubdivide == 0) {
         hasM = true;
@@ -112,9 +131,9 @@ void deck::audioInputListener(float* input, int audioBuffersize){
     
     scratchMLfile.pushTag(name);
     scratchMLfile.pushTag("data");
-    scratchMLfile.addValue("p", xwax.getAbsolute());
+    scratchMLfile.addValue("p", currentPostion);
     scratchMLfile.popTag();
     scratchMLfile.popTag();
-
+    
     audioFrame++;
 }

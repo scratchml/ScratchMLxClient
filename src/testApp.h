@@ -14,22 +14,22 @@ public:
 	void update();
 	void draw();
 	void exit();
-    void audioInputListener (ofxAudioEventArgs &args);
-    bool setupXwax();
     void drawXwax();
     void drawSetup();
+    void audioIn(float * input, int bufferSize, int nChannel);
     ofxXmlSettings scratchMLfile;
     ofxXmlSettings settingsFile;
     ofxOscSender osc;
 	ofSerial serial;
 	graphicCurve drawFader;
     
-    ofxSVG fatLogo;
-    
 	bool serialReady;
 	unsigned char serialThreshold;
 	bool overThreshold;
 	
+    
+    ofxXwax xwax;
+    
 	string recordFormat, recordSide, oscHost, serialPort, audioInterface;
 	unsigned int oscPort, oscSubdivide, audioSamplerate, audioBuffersize;
 	float oscRate;
@@ -51,7 +51,7 @@ public:
     //soundStream---------_
     vector< vector<float> > inputs;
     int nChannels, audioDevice;
-    ofxSoundStream c1;
+    ofSoundStream c1;
     //----soundStream-----_
     
     //drawAudioInput----------_
