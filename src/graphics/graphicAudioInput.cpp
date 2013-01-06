@@ -4,11 +4,11 @@ static const ofColor cyanPrint = ofColor::fromHex(0x00abec);
 static const ofColor magentaPrint = ofColor::fromHex(0xec008c);
 
 void graphicAudioInput::setup(unsigned int newAudioBuffersize) {
-	frontAudioBuffer.resize(newAudioBuffersize * 2);
+	frontAudioBuffer.resize(newAudioBuffersize);
 }
 
 void graphicAudioInput::draw(float x, float y, float scale) {
-	frontAudioBuffer.resize(audioBuffersize * 2);
+	frontAudioBuffer.resize(audioBuffersize);
 	scale /= 4;
 	int resolution = MAX(audioBuffersize / scale, 1);
 	

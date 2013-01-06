@@ -156,7 +156,7 @@ void testApp::setup() {
     
 	loadSettings();
     
-    xwax.setup(audioSamplerate, 256, recordFormat);    
+       
     //fader--------_
     //serialReady = serial.setup(serialPort, 115200);
     //----fader----_
@@ -202,7 +202,7 @@ void testApp::setup() {
         myDeck.recordSide = recordSide;
         myDeck.serialPort = serialPort;
         myDeck.serialThreshold = serialThreshold;
-        myDeck.setup("deck"+ofToString(i), scratchMLfile, xwax);
+        myDeck.setup("deck"+ofToString(i), scratchMLfile);
         decks.push_back(myDeck);
         //------deck-----_
         
@@ -221,11 +221,11 @@ void testApp::update() {
     for (int i = 0; i < totalDecks; i++) {    
         
         
-       
+        
         audioMutex.lock();
         graphicAudioInputs[i].frontAudioBuffer = middleAudioBuffers[i];
         audioMutex.unlock();
-
+        
         if(frame){
             decks[i].audioInputListener(&inputs[i][0], audioBuffersize);
         }
@@ -308,24 +308,24 @@ void testApp::audioIn(float * input, int bufferSize, int nChannel){
     frame = true;
     //inputs-----------_
     // samples are "interleaved"    
-
+    
     int sample = 0;
     for(int i = 0; i < bufferSize; i++) {
-        int k = i * 2; // 2 for stereo
-        for(int c = 0; c < nChannels; c++) {
-            inputs[c][k + 0] = input[sample++];
-            inputs[c][k + 1] = input[sample++];
-        }
+        inputs[0][i*nChannel + 0] = input[sample++];
+        inputs[0][i*nChannel + 1] = input[sample++];
+        inputs[1][i*nChannel + 0] = input[sample++];
+        inputs[1][i*nChannel + 1] = input[sample++];
+
     }    
     
     //drawudioInput----------_
 	for (int i = 0; i < nChannel; i++) {
         audioMutex.lock();
-        middleAudioBuffers[i].assign(&inputs[i][0], &inputs[i][0] + bufferSize * nChannels); 
+        middleAudioBuffers[i].assign(&inputs[i][0], &inputs[i][0] + bufferSize * 2); 
         audioMutex.unlock();
     }
     
-
+    
     
 }
 

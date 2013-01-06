@@ -9,10 +9,10 @@ deck::deck(){
 }
 
 
-void deck::setup(string foo, ofxXmlSettings &bar, ofxXwax &vinyl) {
+void deck::setup(string foo, ofxXmlSettings &bar) {
     ofSetCircleResolution(50);
 	ofSetLineWidth(2);	
-    xwax = vinyl;
+    xwax.setup(audioSamplerate, audioBuffersize); 
     audioFrame = 0;
     oscSubdivide = 8;
     input.resize(audioBuffersize);
@@ -105,15 +105,13 @@ ofxOscMessage deck::getMessage(){
 void deck::audioInputListener(float* input, int audioBuffersize){	
     
     //xwax--------_
-    vector<float> vinyl = xwax.update(input);
-    if(vinyl.size() > 0){
-        currentPostion = vinyl[0];
-        currentRelativePos = vinyl[1];
-        currentPitch = vinyl[2];
-        currentVelocity = vinyl[3];
-    }
-    absolutePosition.push_back(currentPostion);
-    relativePosition.push_back(currentRelativePos);
+    xwax.update(input);
+
+    currentPitch = xwax.getPitch();
+    currentVelocity = xwax.getVelocity();
+    
+    absolutePosition.push_back(xwax.getAbsolute());
+    relativePosition.push_back(xwax.getRelative());
     if(absolutePosition.size() > maxData) {
         absolutePosition.pop_front();
     }
@@ -122,8 +120,8 @@ void deck::audioInputListener(float* input, int audioBuffersize){
     }
     //----xwax----_
     
-    graphVinyl.rotateAbsolute = ofxXwax::millisToDegrees(currentPostion);
-    graphVinyl.rotateRelative = ofxXwax::millisToDegrees(currentRelativePos);
+    graphVinyl.rotateAbsolute = ofxXwax::millisToDegrees(xwax.getAbsolute());
+    graphVinyl.rotateRelative = ofxXwax::millisToDegrees(xwax.getAbsolute());
     
     if(audioFrame % oscSubdivide == 0) {
         hasM = true;

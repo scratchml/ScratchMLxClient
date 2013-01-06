@@ -16,7 +16,7 @@
 class deck : public ofNode{
 public:
     deck();
-	void setup(string foo, ofxXmlSettings &bar, ofxXwax &vinyl);
+	void setup(string foo, ofxXmlSettings &bar);
 	void update();
 	void draw(float newX, float newY);
     void audioInputListener(float* input, int audioBuffersize);
