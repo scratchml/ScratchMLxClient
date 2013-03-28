@@ -1,0 +1,47 @@
+<!-- .d8888b.  888b     d888 888      -->
+<!--d88P  Y88b 8888b   d8888 888      -->
+<!--Y88b.      88888b.d88888 888      -->
+<!-- "Y888b.   888Y88888P888 888      -->
+<!--    "Y88b. 888 Y888P 888 888      -->
+<!--      "888 888  Y8P  888 888      -->
+<!--Y88b  d88P 888   "   888 888      -->
+<!-- "Y8888P"  888       888 88888888 -->
+<?xml version="1.0" encoding="UTF-8" ?>
+<sml>
+    <version>
+        <major>0</major>
+        <minor>6</minor>
+    </version>
+    <about>
+        <client>--ScratchML-- Version: BETA.2</client>
+        <authors>@ScratchML, so blame/tweet them if it sucks ballz</authors>
+        <url>www.scratchml.com</url>
+        <github>https://github.com/scratchml</github>
+    </about>
+    <audio>
+        <sample>
+            <filename>optional</filename>
+            <description>optional</description>
+            <deck>optional</deck>
+            <start>0.000000000</start>
+            <stop>0.000000000</stop>
+        </sample>
+    </audio>
+    <performance>
+        <mixer>
+            <fader>
+                <data></data>
+            </fader>
+        </mixer>
+        <turntable>
+            <deck>deck-0</deck>
+            <samplerate>375</samplerate>
+            <data></data>
+        </turntable>
+        <turntable>
+            <deck>deck-1</deck>
+            <samplerate>375</samplerate>
+            <data></data>
+        </turntable>
+    </performance>
+</sml>

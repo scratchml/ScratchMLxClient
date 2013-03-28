@@ -1,4 +1,4 @@
 ofxOsc
-ofxSoundStream
+ofxSvg
 ofxXmlSettings
 ofxXwax

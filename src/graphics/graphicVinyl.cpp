@@ -1,7 +1,5 @@
 #include "graphicVinyl.h"
 
-static const ofColor magentaPrint = ofColor::fromHex(0xec008c);
-static const ofColor yellowPrint = ofColor::fromHex(0xffee00);
 
 void graphicVinyl::draw(float x, float y, float scale) {
 	scale /= 2;
@@ -16,17 +14,22 @@ void graphicVinyl::draw(float x, float y, float scale) {
 	ofCircle(0, 0, 1);
 	
 	ofPushMatrix();
-	ofSetColor(yellowPrint);
+	ofSetColor(ofColor::yellow);
 	ofRotate(rotateAbsolute);
 	ofLine(0, 0, 0, 1);
 	ofPopMatrix();
 	
 	ofPushMatrix();
-	ofSetColor(magentaPrint);
+	ofSetColor(ofColor::magenta);
 	ofRotate(rotateRelative);
 	ofLine(0, 0, 0, 1);
 	ofPopMatrix();
 	
 	ofPopMatrix();
 	ofPopStyle();
+}
+
+void graphicVinyl::update(float abs, float rel){
+    rotateAbsolute = ofMap(rel, 0, 1800, 0, 360);
+    rotateRelative = ofMap(abs, 0, 1800, 0, 360);
 }
